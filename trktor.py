@@ -1,6 +1,6 @@
 #!/usr/bin/pyton3
 """
- Jump game example with scrolling background
+Simons jump game
 """
 import sys
 import math
@@ -12,7 +12,8 @@ SCREEN_H = 800
 
 CLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((SCREEN_W, SCREEN_H))
-pygame.display.set_caption("Jumping in PyGame")
+
+pygame.display.set_caption("simons traktor spiel")
 
 X_POSITION, Y_POSITION = 200, 660
 
@@ -21,7 +22,7 @@ ROCK_X_POSITION, ROCK_Y_POSITION = 600, 660
 O_X_POSITION = X_POSITION
 O_Y_POSITION = Y_POSITION
 
-jumping = False
+JUMPS = False
 
 Y_GRAVITY = 0.6
 JUMP_HEIGHT = 23
@@ -37,7 +38,8 @@ ROCK_SURFACE = pygame.transform.scale(pygame.image.load("assets/rock.png"), (77,
 
 BACKGROUND = pygame.image.load("assets/background.png")
 BACKGROUND_W = BACKGROUND.get_width()
-scroll = 0
+
+SCROLL = 0
 
 tiles = math.ceil(SCREEN_W / BACKGROUND_W) + 1
 
@@ -58,10 +60,10 @@ while True:
         break
 
     if keys_pressed[pygame.K_SPACE]:
-        jumping = True
+        JUMPS = True
 
     for i in range(0, tiles):
-        SCREEN.blit(BACKGROUND, (i * BACKGROUND_W + scroll, 0))
+        SCREEN.blit(BACKGROUND, (i * BACKGROUND_W + SCROLL, 0))
 
     rock_rect.x -= 3
     if rock_rect.x < 0:
@@ -69,16 +71,16 @@ while True:
 
     SCREEN.blit(ROCK_SURFACE, rock_rect)
 
-    scroll -= 5
+    SCROLL -= 5
 
-    if abs(scroll) > BACKGROUND_W:
-        scroll = 0
+    if abs(SCROLL) > BACKGROUND_W:
+        SCROLL = 0
 
-    if jumping:
+    if JUMPS:
         Y_POSITION -= Y_VELOCITY
         Y_VELOCITY -= Y_GRAVITY
         if Y_VELOCITY < -JUMP_HEIGHT:
-            jumping = False
+            JUMPS = False
             Y_VELOCITY = JUMP_HEIGHT
 
         trktor_rect = JUMPING_SURFACE.get_rect(center=(X_POSITION, Y_POSITION))
