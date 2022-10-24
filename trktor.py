@@ -14,7 +14,9 @@ CLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((SCREEN_W, SCREEN_H))
 pygame.display.set_caption("Jumping in PyGame")
 
-X_POSITION, Y_POSITION = 400, 660
+X_POSITION, Y_POSITION = 200, 660
+
+ROCK_X_POSITION, ROCK_Y_POSITION = 600, 660
 
 O_X_POSITION = X_POSITION
 O_Y_POSITION = Y_POSITION
@@ -22,7 +24,7 @@ O_Y_POSITION = Y_POSITION
 jumping = False
 
 Y_GRAVITY = 0.6
-JUMP_HEIGHT = 20
+JUMP_HEIGHT = 23
 Y_VELOCITY = JUMP_HEIGHT
 
 STANDING_SURFACE = pygame.transform.scale(
@@ -31,13 +33,17 @@ STANDING_SURFACE = pygame.transform.scale(
 JUMPING_SURFACE = pygame.transform.scale(
     pygame.image.load("assets/trktor_jumping.png"), (77, 64)
 )
+ROCK_SURFACE = pygame.transform.scale(pygame.image.load("assets/rock.png"), (77, 64))
+
 BACKGROUND = pygame.image.load("assets/background.png")
 BACKGROUND_W = BACKGROUND.get_width()
 scroll = 0
 
 tiles = math.ceil(SCREEN_W / BACKGROUND_W) + 1
 
-mario_rect = STANDING_SURFACE.get_rect(center=(X_POSITION, Y_POSITION))
+trktor_rect = STANDING_SURFACE.get_rect(center=(X_POSITION, Y_POSITION))
+rock_rect = ROCK_SURFACE.get_rect(center=(ROCK_X_POSITION, ROCK_Y_POSITION))
+
 
 while True:
     for event in pygame.event.get():
@@ -47,11 +53,21 @@ while True:
 
     keys_pressed = pygame.key.get_pressed()
 
+    if trktor_rect.colliderect(rock_rect):
+        print("YOU MESSED UP")
+        break
+
     if keys_pressed[pygame.K_SPACE]:
         jumping = True
 
     for i in range(0, tiles):
         SCREEN.blit(BACKGROUND, (i * BACKGROUND_W + scroll, 0))
+
+    rock_rect.x -= 3
+    if rock_rect.x < 0:
+        rock_rect.x = ROCK_X_POSITION
+
+    SCREEN.blit(ROCK_SURFACE, rock_rect)
 
     scroll -= 5
 
@@ -65,11 +81,11 @@ while True:
             jumping = False
             Y_VELOCITY = JUMP_HEIGHT
 
-        mario_rect = JUMPING_SURFACE.get_rect(center=(X_POSITION, Y_POSITION))
-        SCREEN.blit(JUMPING_SURFACE, mario_rect)
+        trktor_rect = JUMPING_SURFACE.get_rect(center=(X_POSITION, Y_POSITION))
+        SCREEN.blit(JUMPING_SURFACE, trktor_rect)
     else:
-        mario_rect = STANDING_SURFACE.get_rect(center=(O_X_POSITION, O_Y_POSITION))
-        SCREEN.blit(STANDING_SURFACE, mario_rect)
+        trktor_rect = STANDING_SURFACE.get_rect(center=(O_X_POSITION, O_Y_POSITION))
+        SCREEN.blit(STANDING_SURFACE, trktor_rect)
 
     pygame.display.update()
     CLOCK.tick(60)
