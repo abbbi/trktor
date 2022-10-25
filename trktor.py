@@ -88,8 +88,8 @@ def button(screen, position, text):
     return screen.blit(text_render, (x, y))
 
 
-def menu(screen):
-    b2 = button(screen, (400, 400), "Start")
+def menu(screen, text="Start"):
+    b2 = button(screen, (400, 400), text)
     cont = False
     while cont is False:
         for event in pygame.event.get():
@@ -210,10 +210,15 @@ def main():
     gameobj = game()
     background = pygame.image.load("assets/background.png")
     screen.blit(background, (0, 0))
-
     while True:
         menu(screen)
         mainloop(gameobj, clock, background, screen)
+        gameobj.coins -= 1
+
+        if gameobj.coins == 0:
+            break
+
+    menu(screen, text="Gameover")
 
 
 if __name__ == "__main__":
