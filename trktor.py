@@ -154,7 +154,7 @@ def mainloop(gameobj, clock, background, screen):
     obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, obstacle.y))
 
     while True:
-        if obstacle_rect.x < vehicle_rect.x:
+        if obstacle_rect.x <= 5:
             obstacle_ = obstacles[random.randrange(0, len(obstacles))]
             obstaclesf = pygame.transform.scale(
                 pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
