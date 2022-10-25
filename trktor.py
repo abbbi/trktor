@@ -78,7 +78,7 @@ def load_obstacles(path):
 
 def button(screen, position, text):
     font = pygame.font.SysFont("Arial", 50)
-    text_render = font.render(text, 1, (255, 0, 0))
+    text_render = font.render(text, 1, (255, 255, 255))
     x, y, w, h = text_render.get_rect()
     x, y = position
     pygame.draw.line(screen, (150, 150, 150), (x, y), (x + w, y), 5)
@@ -89,8 +89,8 @@ def button(screen, position, text):
     return screen.blit(text_render, (x, y))
 
 
-def menu(screen, text="Start"):
-    b2 = button(screen, (400, 400), text)
+def menu(screen, gameobj, text="Start"):
+    b2 = button(screen, (gameobj.screen_h / 2, gameobj.screen_w / 2), text)
     cont = False
     while cont is False:
         for event in pygame.event.get():
@@ -231,7 +231,7 @@ def main():
 
     start_time = datetime.now()
     while True:
-        menu(screen, text=text)
+        menu(screen, gameobj, text=text)
         mainloop(gameobj, clock, background, screen)
         text = "Neustart"
         gameobj.coins -= 1
@@ -242,12 +242,12 @@ def main():
         if since_crash.seconds >= 30:
             start_time = datetime.now()
             print("Raising level")
-            gameobj.fps+=20
+            gameobj.fps += 20
 
         if gameobj.coins == 0:
             break
 
-    menu(screen, text="Gameover")
+    menu(screen, gameobj, text="Gameover")
 
 
 if __name__ == "__main__":
