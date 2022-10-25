@@ -10,6 +10,7 @@ from glob import glob
 import json
 import random
 import pygame
+import pygame_menu
 from pygame import mixer
 
 
@@ -87,6 +88,13 @@ def button(screen, position, text):
 def menu(screen, gameobj, clock, background, text="Start"):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
+
+    mytheme = pygame_menu.themes.THEME_ORANGE.copy()
+    mytheme.title_background_color=(0, 0, 0)
+
+    menu = pygame_menu.Menu(300, 400,
+                       theme=pygame_menu.themes.THEME_BLUE,
+                       title='Welcome')
 
     b2 = button(screen, (gameobj.screen_h / 2, gameobj.screen_w / 2), text)
     cont = False
