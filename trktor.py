@@ -140,6 +140,8 @@ def main():
 
         if keys_pressed[pygame.K_SPACE]:
             gameobj.jumps = True
+            jump = mixer.Sound(f"{gameobj.media}/jump.ogg")
+            jump.play()
 
         for i in range(0, gameobj.tiles):
             screen.blit(background, (i * background_width + gameobj.scroll, 0))
