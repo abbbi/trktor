@@ -41,6 +41,7 @@ class game:
     y_gravity: float = 0.6
     y_velocity = jump_height
     scroll: int = 0
+    scrollstep: int = 5
     caption: str = "simons traktor spiel"
     tiles: int = 0
     jumps: bool = False
@@ -183,7 +184,7 @@ def mainloop(gameobj, clock, background, screen):
             obstacle_rect.x = obstacle_.x
 
         screen.blit(obstaclesf, obstacle_rect)
-        gameobj.scroll -= 5
+        gameobj.scroll -= gameobj.scrollstep
 
         if abs(gameobj.scroll) > background_width:
             gameobj.scroll = 0
@@ -247,6 +248,7 @@ def main():
             start_time = datetime.now()
             print("Raising level")
             gameobj.fps += 20
+            gameobj.scrollstep += 5
 
         if gameobj.coins == 0:
             break
