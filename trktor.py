@@ -35,7 +35,7 @@ class game:
     screen_w: int = 800
     screen_h: int = 800
     fps: int = 60
-    jump_height: int = 25
+    jump_height: int = 22
     y_gravity: float = 0.6
     y_velocity = jump_height
     scroll: int = 0
@@ -207,7 +207,7 @@ def mainloop(gameobj, clock, background, screen):
         for c in range(0, gameobj.coins):
             coin_rect = coinsf.get_rect(center=(s, 45))
             screen.blit(coinsf, coin_rect)
-            s += coin.width+20
+            s += coin.width + 20
         pygame.display.update()
         clock.tick(gameobj.fps)
 
