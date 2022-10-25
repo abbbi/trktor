@@ -100,18 +100,7 @@ def menu(screen):
         pygame.display.update()
 
 
-def main():
-    pygame.init()
-    mixer.init()
-    clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((game.screen_w, game.screen_h))
-    pygame.display.set_caption(game.caption)
-
-    gameobj = game()
-    background = pygame.image.load("assets/background.png")
-    screen.blit(background, (0, 0))
-    menu(screen)
-
+def mainloop(gameobj, clock, background, screen):
     mixer.music.load(f"{gameobj.media}/trktor.mp3")
     mixer.music.play()
 
@@ -209,8 +198,22 @@ def main():
     mixer.music.stop()
     crash = mixer.Sound(f"{gameobj.media}/crash.ogg")
     crash.play()
+
+
+def main():
+    pygame.init()
+    mixer.init()
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode((game.screen_w, game.screen_h))
+    pygame.display.set_caption(game.caption)
+
+    gameobj = game()
+    background = pygame.image.load("assets/background.png")
+    screen.blit(background, (0, 0))
+
     while True:
-        pygame.display.update()
+        menu(screen)
+        mainloop(gameobj, clock, background, screen)
 
 
 if __name__ == "__main__":
