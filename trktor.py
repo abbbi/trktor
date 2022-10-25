@@ -183,14 +183,16 @@ def mainloop(gameobj, clock, background, screen):
             if gameobj.coins == 0:
                 break
             if obstacle_.hit is False:
+                hit = mixer.Sound(f"{gameobj.media}/hit.ogg")
+                hit.play()
                 gameobj.coins -= 1
                 obstacle_.hit = True
 
         if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup == "coin":
             if gameobj.coins < gameobj.maxcoins and obstacle_.hit is False:
                 gameobj.coins += 1
-                jump = mixer.Sound(f"{gameobj.media}/coin.ogg")
-                jump.play()
+                coin = mixer.Sound(f"{gameobj.media}/coin.ogg")
+                coin.play()
                 obstacle_.hit = True
 
         for event in pygame.event.get():
@@ -255,32 +257,16 @@ def main():
     screen = pygame.display.set_mode((game.screen_w, game.screen_h))
     pygame.display.set_caption(game.caption)
 
-    gameobj = game()
     background = pygame.image.load("assets/background.png")
     screen.blit(background, (0, 0))
     text = "Start"
 
     start_time = datetime.now()
     while True:
+        gameobj = game()
         menu(screen, gameobj, clock, background, text=text)
         mainloop(gameobj, clock, background, screen)
         text = "Neustart"
-        gameobj.coins -= 1
-
-        crash_time = datetime.now()
-        since_crash = crash_time - start_time
-
-        if since_crash.seconds >= 30:
-            start_time = datetime.now()
-            print("Raising level")
-            gameobj.fps += 20
-            gameobj.scrollstep += 5
-
-        if gameobj.coins == 0:
-            break
-
-    menu(screen, gameobj, clock, background, text="Gameover")
-
 
 if __name__ == "__main__":
     main()
