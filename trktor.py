@@ -20,7 +20,9 @@ class obstacle:
     height: int
     width: int
     x: int
-    y: int = 660
+    y: int = 628
+    powerup: str = None
+    hit: bool = False
 
 
 @dataclass
@@ -47,7 +49,8 @@ class game:
     jumps: bool = False
     media = "assets/"
     media_obstacles = f"{media}/obstacles/"
-    coins: int = 5
+    coins: int = 3
+    maxcoins: int = coins
 
 
 @dataclass
@@ -73,6 +76,10 @@ def load_obstacles(path):
             height=info["height"],
             x=info["x"],
         )
+        try:
+            this.powerup = info["powerup"]
+        except KeyError:
+            pass
         obstacles.append(this)
 
     return obstacles
@@ -100,10 +107,30 @@ def menu(screen, gameobj, clock, background, text="Start"):
                     cont = True
                     break
         if keys_pressed[pygame.K_s]:
-            cont=True
+            cont = True
             break
 
         pygame.display.update()
+
+
+def draw_coins(screen, gameobj, vh_jumping):
+    coin = vehicle(
+        asset="assets/trktor_jumping.png",
+        height=56,
+        width=36,
+    )
+    coinsf = pygame.transform.scale(
+        pygame.image.load(
+            vh_jumping.asset,
+        ),
+        (coin.height, coin.width),
+    )
+
+    s = coin.width
+    for c in range(0, gameobj.coins):
+        coin_rect = coinsf.get_rect(center=(s, 45))
+        screen.blit(coinsf, coin_rect)
+        s += coin.width + 20
 
 
 def mainloop(gameobj, clock, background, screen):
@@ -128,31 +155,17 @@ def mainloop(gameobj, clock, background, screen):
         ),
         (vh_jumping.height, vh_jumping.width),
     )
-
-    coin = vehicle(
-        asset="assets/trktor_jumping.png",
-        height=56,
-        width=36,
-    )
-    coinsf = pygame.transform.scale(
-        pygame.image.load(
-            vh_jumping.asset,
-        ),
-        (coin.height, coin.width),
-    )
-
     obstacles = load_obstacles(game.media_obstacles)
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
     obstaclesf = pygame.transform.scale(
         pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
     )
-
     background_width = background.get_width()
-
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
-
     vehicle_rect = vhsf_standing.get_rect(center=(vehicle.x, vehicle.y))
-    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, obstacle.y))
+    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, obstacle_.y))
+    obstacle_rect.y = obstacle_.y
+    obstacle_rect.x = obstacle_.x
 
     while True:
         if obstacle_rect.x <= 5:
@@ -160,6 +173,25 @@ def mainloop(gameobj, clock, background, screen):
             obstaclesf = pygame.transform.scale(
                 pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
             )
+            if obstacle_.powerup is not None:
+                obstacle_rect.y = random.randrange(200, 300)
+            else:
+                obstacle_rect.y = obstacle_.y
+            obstacle_rect.x = obstacle_.x
+
+        if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup is None:
+            if gameobj.coins == 0:
+                break
+            if obstacle_.hit is False:
+                gameobj.coins -= 1
+                obstacle_.hit = True
+
+        if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup == "coin":
+            if gameobj.coins < gameobj.maxcoins and obstacle_.hit is False:
+                gameobj.coins += 1
+                jump = mixer.Sound(f"{gameobj.media}/coin.ogg")
+                jump.play()
+                obstacle_.hit = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -167,10 +199,6 @@ def mainloop(gameobj, clock, background, screen):
                 sys.exit()
 
         keys_pressed = pygame.key.get_pressed()
-
-        if vehicle_rect.colliderect(obstacle_rect):
-            break
-
         if keys_pressed[pygame.K_SPACE]:
             gameobj.jumps = True
             jump = mixer.Sound(f"{gameobj.media}/jump.ogg")
@@ -182,8 +210,10 @@ def mainloop(gameobj, clock, background, screen):
         obstacle_rect.x -= 3
         if obstacle_rect.x < 0:
             obstacle_rect.x = obstacle_.x
+            obstacle_rect.y = obstacle_.y
 
         screen.blit(obstaclesf, obstacle_rect)
+
         gameobj.scroll -= gameobj.scrollstep
 
         if abs(gameobj.scroll) > background_width:
@@ -209,11 +239,7 @@ def mainloop(gameobj, clock, background, screen):
             )
             screen.blit(vhsf_standing, vehicle_rect)
 
-        s = coin.width
-        for c in range(0, gameobj.coins):
-            coin_rect = coinsf.get_rect(center=(s, 45))
-            screen.blit(coinsf, coin_rect)
-            s += coin.width + 20
+        draw_coins(screen, gameobj, vh_jumping)
         pygame.display.update()
         clock.tick(gameobj.fps)
 
