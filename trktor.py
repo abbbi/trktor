@@ -89,7 +89,10 @@ def button(screen, position, text):
     return screen.blit(text_render, (x, y))
 
 
-def menu(screen, gameobj, text="Start"):
+def menu(screen, gameobj, clock, background, text="Start"):
+    mixer.music.load(f"{gameobj.media}/menu.mp3")
+    mixer.music.play()
+
     b2 = button(screen, (gameobj.screen_h / 2, gameobj.screen_w / 2), text)
     cont = False
     while cont is False:
@@ -231,7 +234,7 @@ def main():
 
     start_time = datetime.now()
     while True:
-        menu(screen, gameobj, text=text)
+        menu(screen, gameobj, clock, background, text=text)
         mainloop(gameobj, clock, background, screen)
         text = "Neustart"
         gameobj.coins -= 1
@@ -247,7 +250,7 @@ def main():
         if gameobj.coins == 0:
             break
 
-    menu(screen, gameobj, text="Gameover")
+    menu(screen, gameobj, clock, background, text="Gameover")
 
 
 if __name__ == "__main__":
