@@ -9,6 +9,7 @@ from glob import glob
 import json
 import random
 import pygame
+from pygame import mixer
 
 
 @dataclass
@@ -77,10 +78,14 @@ def load_obstacles(path):
 def main():
     pygame.init()
 
+    mixer.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((game.screen_w, game.screen_h))
     pygame.display.set_caption(game.caption)
+
     gameobj = game()
+    mixer.music.load(f"{gameobj.media}/trktor.mp3")
+    mixer.music.play()
 
     vh_standing = vehicle(asset="assets/trktor_standing.png", height=99, width=64)
     vh_jumping = vehicle(
@@ -171,7 +176,6 @@ def main():
 
         pygame.display.update()
         clock.tick(gameobj.fps)
-
 
 if __name__ == "__main__":
     main()
