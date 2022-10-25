@@ -226,9 +226,11 @@ def main():
     gameobj = game()
     background = pygame.image.load("assets/background.png")
     screen.blit(background, (0, 0))
+    text = "Start"
     while True:
-        menu(screen)
+        menu(screen, text=text)
         mainloop(gameobj, clock, background, screen)
+        text = "Neustart"
         gameobj.coins -= 1
 
         if gameobj.coins == 0:
