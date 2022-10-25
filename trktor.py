@@ -105,25 +105,36 @@ def mainloop(gameobj, clock, background, screen):
     mixer.music.play()
 
     vh_standing = vehicle(asset="assets/trktor_standing.png", height=99, width=64)
-    vh_jumping = vehicle(
-        asset="assets/trktor_jumping.png",
-        height=77,
-        width=64,
-    )
-
     vhsf_standing = pygame.transform.scale(
         pygame.image.load(
             vh_standing.asset,
         ),
         (vh_standing.height, vh_standing.width),
     )
-
+    vh_jumping = vehicle(
+        asset="assets/trktor_jumping.png",
+        height=77,
+        width=64,
+    )
     vhsf_jumping = pygame.transform.scale(
         pygame.image.load(
             vh_jumping.asset,
         ),
         (vh_jumping.height, vh_jumping.width),
     )
+
+    coin = vehicle(
+        asset="assets/trktor_jumping.png",
+        height=56,
+        width=36,
+    )
+    coinsf = pygame.transform.scale(
+        pygame.image.load(
+            vh_jumping.asset,
+        ),
+        (coin.height, coin.width),
+    )
+
     obstacles = load_obstacles(game.media_obstacles)
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
     obstaclesf = pygame.transform.scale(
@@ -192,6 +203,11 @@ def mainloop(gameobj, clock, background, screen):
             )
             screen.blit(vhsf_standing, vehicle_rect)
 
+        s = coin.width
+        for c in range(0, gameobj.coins):
+            coin_rect = coinsf.get_rect(center=(s, 45))
+            screen.blit(coinsf, coin_rect)
+            s += coin.width+20
         pygame.display.update()
         clock.tick(gameobj.fps)
 
