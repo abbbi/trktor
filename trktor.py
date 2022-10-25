@@ -16,8 +16,8 @@ class obstacle:
     asset: str
     height: int
     width: int
+    x: int
     y: int = 660
-    x: int = 600
 
 
 @dataclass
@@ -60,10 +60,14 @@ class vehicle:
 def load_obstacles(path):
     obstacles = []
     for odir in glob(f"{path}/*/"):
+        print(f"{odir}/info.json")
         with open(f"{odir}/info.json", "r") as j:
             info = json.loads(j.read())
         this = obstacle(
-            asset=f"{odir}/img.png", width=info["width"], height=info["height"]
+            asset=f"{odir}/img.png",
+            width=info["width"],
+            height=info["height"],
+            x=info["x"],
         )
         obstacles.append(this)
 
@@ -109,7 +113,7 @@ def main():
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
 
     vehicle_rect = vhsf_standing.get_rect(center=(vehicle.x, vehicle.y))
-    obstacle_rect = obstaclesf.get_rect(center=(obstacle.x, obstacle.y))
+    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, obstacle.y))
 
     while True:
         if obstacle_rect.x < vehicle_rect.x:
@@ -137,7 +141,7 @@ def main():
 
         obstacle_rect.x -= 3
         if obstacle_rect.x < 0:
-            obstacle_rect.x = obstacle.x
+            obstacle_rect.x = obstacle_.x
 
         screen.blit(obstaclesf, obstacle_rect)
         gameobj.scroll -= 5
