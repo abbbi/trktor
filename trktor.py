@@ -91,11 +91,16 @@ def menu(screen, gameobj, clock, background, text="Start"):
     b2 = button(screen, (gameobj.screen_h / 2, gameobj.screen_w / 2), text)
     cont = False
     while cont is False:
+        keys_pressed = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if b2.collidepoint(pygame.mouse.get_pos()):
                     cont = True
                     break
+        if keys_pressed[pygame.K_s]:
+            cont=True
+            break
+
         pygame.display.update()
 
 
