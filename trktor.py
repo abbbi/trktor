@@ -109,14 +109,15 @@ def main():
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
 
     vehicle_rect = vhsf_standing.get_rect(center=(vehicle.x, vehicle.y))
-
-    obstacle_ = obstacles[random.randrange(0, len(obstacles))]
-    obstaclesf = pygame.transform.scale(
-        pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
-    )
     obstacle_rect = obstaclesf.get_rect(center=(obstacle.x, obstacle.y))
 
     while True:
+        if obstacle_rect.x < vehicle_rect.x:
+            obstacle_ = obstacles[random.randrange(0, len(obstacles))]
+            obstaclesf = pygame.transform.scale(
+                pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
+            )
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
