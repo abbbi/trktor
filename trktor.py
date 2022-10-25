@@ -163,7 +163,6 @@ def main():
         keys_pressed = pygame.key.get_pressed()
 
         if vehicle_rect.colliderect(obstacle_rect):
-            print("YOU MESSED UP")
             break
 
         if keys_pressed[pygame.K_SPACE]:
@@ -206,6 +205,12 @@ def main():
 
         pygame.display.update()
         clock.tick(gameobj.fps)
+
+    mixer.music.stop()
+    crash = mixer.Sound(f"{gameobj.media}/crash.ogg")
+    crash.play()
+    while True:
+        pygame.display.update()
 
 
 if __name__ == "__main__":
