@@ -4,6 +4,7 @@ Simons jump game
 """
 import sys
 import math
+from datetime import datetime
 from dataclasses import dataclass
 from glob import glob
 import json
@@ -227,11 +228,21 @@ def main():
     background = pygame.image.load("assets/background.png")
     screen.blit(background, (0, 0))
     text = "Start"
+
+    start_time = datetime.now()
     while True:
         menu(screen, text=text)
         mainloop(gameobj, clock, background, screen)
         text = "Neustart"
         gameobj.coins -= 1
+
+        crash_time = datetime.now()
+        since_crash = crash_time - start_time
+
+        if since_crash.seconds >= 30:
+            start_time = datetime.now()
+            print("Raising level")
+            gameobj.fps+=20
 
         if gameobj.coins == 0:
             break
