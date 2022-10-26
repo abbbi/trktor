@@ -16,9 +16,6 @@ from pygame import mixer
 
 from objects import obstacle, world, surface, game, vehicle
 
-bundle_dir = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
-
-
 def load_obstacles(path):
     obstacles = []
     for odir in glob(f"{path}/*/"):
