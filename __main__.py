@@ -3,6 +3,7 @@
 Simons jump game
 """
 import sys
+import os
 import copy
 import math
 from datetime import datetime
@@ -14,6 +15,8 @@ import pygame_menu
 from pygame import mixer
 
 from objects import obstacle, world, surface, game, vehicle
+
+bundle_dir = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
 
 
 def load_obstacles(path):
@@ -74,7 +77,7 @@ def menu(screen, gameobj, clock, background):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
     myimage = pygame_menu.baseimage.BaseImage(
-        image_path="assets/worlds/0/img.png",
+        image_path=f"{gameobj.media}/worlds/0/img.png",
     )
     mytheme = pygame_menu.themes.THEME_ORANGE.copy()
     mytheme.title_background_color = (0, 0, 0)
@@ -268,6 +271,8 @@ def main():
     world = worlds[random.randrange(0, len(worlds))]
     background = pygame.image.load(world.asset)
     screen.blit(background, (0, 0))
+
+    print(game.media)
 
     start_time = datetime.now()
     while True:

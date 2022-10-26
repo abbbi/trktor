@@ -2,7 +2,12 @@
 """
 Simons jump game
 """
+import os
+import sys
 from dataclasses import dataclass
+
+bundle_dir = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
+asset_dir = os.path.abspath(os.path.join(bundle_dir, "assets"))
 
 
 @dataclass
@@ -43,7 +48,7 @@ class game:
     caption: str = "simons traktor spiel"
     tiles: int = 0
     jumps: bool = False
-    media = "assets/"
+    media: str =  asset_dir
     media_obstacles = f"{media}/obstacles/"
     media_vehicles = f"{media}/vehicles/"
     media_worlds = f"{media}/worlds/"
