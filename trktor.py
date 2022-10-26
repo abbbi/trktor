@@ -156,19 +156,18 @@ def menu(screen, gameobj, clock, background, text="Start"):
 
 
 def draw_coins(screen, gameobj, vh_jumping):
-    coin = vehicle(asset="assets/trktor_jumping.png", height=56, width=36, sound=None)
     coinsf = pygame.transform.scale(
         pygame.image.load(
             vh_jumping.asset,
         ),
-        (coin.height, coin.width),
+        (vh_jumping.height, vh_jumping.width),
     )
 
-    s = coin.width
+    s = vh_jumping.width
     for c in range(0, gameobj.coins):
         coin_rect = coinsf.get_rect(center=(s, 45))
         screen.blit(coinsf, coin_rect)
-        s += coin.width + 20
+        s += vh_jumping.width + 20
 
 
 def spawn_obstacle(gameobj, obstaclesf, obstacle_rect, obstacles):
