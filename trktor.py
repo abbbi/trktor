@@ -69,6 +69,7 @@ class vehicle:
     asset: str
     height: int
     width: int
+    sound: str
     y: int = 0
     x: int = 200
     x_start: int = 200
@@ -118,6 +119,7 @@ def load_vehicles(path):
             info = json.loads(j.read())
         this = vehicle(
             asset=f"{odir}/img.png",
+            sound=f"{odir}/sound.mp3",
             width=info["width"],
             height=info["height"],
             x=info["x"],
@@ -159,6 +161,7 @@ def draw_coins(screen, gameobj, vh_jumping):
         asset="assets/trktor_jumping.png",
         height=56,
         width=36,
+        sound=None
     )
     coinsf = pygame.transform.scale(
         pygame.image.load(
@@ -207,8 +210,6 @@ def handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_):
 
 
 def mainloop(gameobj, clock, background, screen):
-    mixer.music.load(f"{gameobj.media}/trktor.mp3")
-    mixer.music.play()
     gameobj.coin_sound = mixer.Sound(f"{gameobj.media}/coin.ogg")
     gameobj.hit_sound = mixer.Sound(f"{gameobj.media}/hit.ogg")
 
@@ -217,6 +218,9 @@ def mainloop(gameobj, clock, background, screen):
 
     thisvehicle = vehicles[random.randrange(0, len(vehicles))]
     thisvehicle.y = gameobj.platform_height
+
+    mixer.music.load(thisvehicle.sound)
+    mixer.music.play()
 
     vh_standing = thisvehicle
     vh_jumping = copy.copy(thisvehicle)
