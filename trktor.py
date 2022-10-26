@@ -139,7 +139,7 @@ def menu(screen, gameobj, clock, background, text="Start"):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
     myimage = pygame_menu.baseimage.BaseImage(
-        image_path="assets/background.png",
+        image_path="assets/worlds/0/img.png",
     )
     mytheme = pygame_menu.themes.THEME_ORANGE.copy()
     mytheme.title_background_color = (0, 0, 0)
