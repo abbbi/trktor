@@ -62,6 +62,7 @@ class game:
     hit_sound: object = None
     coin_sound: object = None
     platform_height: int = 0
+    vehicle: object = None
 
 
 @dataclass
@@ -147,8 +148,14 @@ def menu(screen, gameobj, clock, background, text="Start"):
         gameobj.scrollstep += two
         gameobj.jump_height -= 3
 
+    def set_tractor(one, two):
+        gameobj.vehicle = two
+
     menu.add.selector(
         "Modus: ", [("Einfach", 0), ("Schwer", 10)], onchange=set_difficulty
+    )
+    menu.add.selector(
+        "Traktor:", [("Auto", None),("Gruen", 0), ("Rot", 1)], onchange=set_tractor
     )
     menu.add.button("Spiel Starten", menu.disable)
     menu.add.button("Quit", pygame_menu.events.EXIT)
@@ -210,6 +217,8 @@ def mainloop(gameobj, clock, background, screen):
     vehicles = load_vehicles(game.media_vehicles)
 
     thisvehicle = vehicles[random.randrange(0, len(vehicles))]
+    if gameobj.vehicle is not None:
+        thisvehicle = vehicles[gameobj.vehicle]
     thisvehicle.y = gameobj.platform_height
 
     mixer.music.load(thisvehicle.sound)
