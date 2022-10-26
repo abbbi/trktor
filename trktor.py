@@ -155,7 +155,7 @@ def menu(screen, gameobj, clock, background, text="Start"):
         "Modus: ", [("Einfach", 0), ("Schwer", 10)], onchange=set_difficulty
     )
     menu.add.selector(
-        "Traktor:", [("Auto", None),("Gruen", 0), ("Rot", 1)], onchange=set_tractor
+        "Traktor:", [("Egal", None),("Gruen", 0), ("Rot", 1)], onchange=set_tractor
     )
     menu.add.button("Spiel Starten", menu.disable)
     menu.add.button("Quit", pygame_menu.events.EXIT)
