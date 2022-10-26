@@ -164,6 +164,7 @@ def spawn_obstacle(obstaclesf, obstacle_rect, obstacles):
     else:
         obstacle_rect.y = obstacle_.y
     obstacle_rect.x = obstacle_.x
+    obstacle_.hit = False
     return obstacle_, obstaclesf
 
 
