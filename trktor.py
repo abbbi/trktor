@@ -11,7 +11,7 @@ from glob import glob
 import json
 import random
 import pygame
-#import pygame_menu
+import pygame_menu
 from pygame import mixer
 
 
@@ -117,21 +117,20 @@ def button(screen, position, text):
 def menu(screen, gameobj, clock, background, text="Start"):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
+    myimage = pygame_menu.baseimage.BaseImage(
+        image_path="assets/background.png",
+    )
+    mytheme = pygame_menu.themes.THEME_ORANGE.copy()
+    mytheme.title_background_color = (0, 0, 0)
+    mytheme.background_color = myimage
 
-    b2 = button(screen, (gameobj.screen_h / 2, gameobj.screen_w / 2), text)
-    cont = False
-    while cont is False:
-        keys_pressed = pygame.key.get_pressed()
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if b2.collidepoint(pygame.mouse.get_pos()):
-                    cont = True
-                    break
-        if keys_pressed[pygame.K_s]:
-            cont = True
-            break
+    menu = pygame_menu.Menu(
+        height=gameobj.screen_h, theme=mytheme, title="Trktor", width=gameobj.screen_w
+    )
 
-        pygame.display.update()
+    menu.add.button("Play", menu.disable)
+    menu.add.button("Quit", pygame_menu.events.EXIT)
+    menu.mainloop(screen)
 
 
 def draw_coins(screen, gameobj, vh_jumping):
