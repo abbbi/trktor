@@ -260,6 +260,12 @@ def mainloop(gameobj, clock, background, screen):
     crash.play()
 
 
+def draw_background(screen, asset):
+    background = pygame.image.load(asset)
+    screen.blit(background, (0, 0))
+    return background
+
+
 def main():
     pygame.init()
     mixer.init()
@@ -269,8 +275,8 @@ def main():
 
     worlds = load_worlds(game.media_worlds)
     world = worlds[random.randrange(0, len(worlds))]
-    background = pygame.image.load(world.asset)
-    screen.blit(background, (0, 0))
+
+    background = draw_background(screen, world.asset)
 
     print(game.media)
 
