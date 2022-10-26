@@ -129,14 +129,6 @@ def load_vehicles(path):
     return vehicles
 
 
-def button(screen, position, text):
-    font = pygame.font.SysFont("Arial", 50)
-    text_render = font.render(text, 1, (255, 255, 255))
-    x, y, w, h = text_render.get_rect()
-    x, y = position
-    return screen.blit(text_render, (x, y))
-
-
 def menu(screen, gameobj, clock, background, text="Start"):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
@@ -151,18 +143,20 @@ def menu(screen, gameobj, clock, background, text="Start"):
         height=gameobj.screen_h, theme=mytheme, title="Trktor", width=gameobj.screen_w
     )
 
-    menu.add.button("Play", menu.disable)
+    def set_difficulty(one, two):
+        gameobj.scrollstep += two
+        gameobj.jump_height -= 3
+
+    menu.add.selector(
+        "Modus: ", [("Einfach", 0), ("Schwer", 10)], onchange=set_difficulty
+    )
+    menu.add.button("Spiel Starten", menu.disable)
     menu.add.button("Quit", pygame_menu.events.EXIT)
     menu.mainloop(screen)
 
 
 def draw_coins(screen, gameobj, vh_jumping):
-    coin = vehicle(
-        asset="assets/trktor_jumping.png",
-        height=56,
-        width=36,
-        sound=None
-    )
+    coin = vehicle(asset="assets/trktor_jumping.png", height=56, width=36, sound=None)
     coinsf = pygame.transform.scale(
         pygame.image.load(
             vh_jumping.asset,
