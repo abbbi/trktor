@@ -51,6 +51,8 @@ class game:
     media_obstacles = f"{media}/obstacles/"
     coins: int = 3
     maxcoins: int = coins
+    hit_sounnd: object = None
+    coin_sounnd: object = None
 
 
 @dataclass
@@ -133,9 +135,42 @@ def draw_coins(screen, gameobj, vh_jumping):
         s += coin.width + 20
 
 
+def spawn_obstacle(obstaclesf, obstacle_rect, obstacles):
+    obstacle_ = obstacles[random.randrange(0, len(obstacles))]
+    obstaclesf = pygame.transform.scale(
+        pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
+    )
+    if obstacle_.powerup is not None:
+        obstacle_rect.y = random.randrange(200, 300)
+    else:
+        obstacle_rect.y = obstacle_.y
+    obstacle_rect.x = obstacle_.x
+    return obstacle_, obstaclesf
+
+
+def handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_):
+    if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup is None:
+        if gameobj.coins == 0:
+            return True
+        if obstacle_.hit is False:
+            gameobj.hit_sound.play()
+            gameobj.coins -= 1
+            obstacle_.hit = True
+
+    if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup == "coin":
+        if gameobj.coins < gameobj.maxcoins and obstacle_.hit is False:
+            gameobj.coins += 1
+            gameobj.coin_sound.play()
+            obstacle_.hit = True
+
+    return False
+
+
 def mainloop(gameobj, clock, background, screen):
     mixer.music.load(f"{gameobj.media}/trktor.mp3")
     mixer.music.play()
+    gameobj.coin_sound = mixer.Sound(f"{gameobj.media}/coin.ogg")
+    gameobj.hit_sound = mixer.Sound(f"{gameobj.media}/hit.ogg")
 
     vh_standing = vehicle(asset="assets/trktor_standing.png", height=99, width=64)
     vhsf_standing = pygame.transform.scale(
@@ -169,31 +204,12 @@ def mainloop(gameobj, clock, background, screen):
 
     while True:
         if obstacle_rect.x <= 5:
-            obstacle_ = obstacles[random.randrange(0, len(obstacles))]
-            obstaclesf = pygame.transform.scale(
-                pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
+            (obstacle_, obstaclesf) = spawn_obstacle(
+                obstaclesf, obstacle_rect, obstacles
             )
-            if obstacle_.powerup is not None:
-                obstacle_rect.y = random.randrange(200, 300)
-            else:
-                obstacle_rect.y = obstacle_.y
-            obstacle_rect.x = obstacle_.x
 
-        if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup is None:
-            if gameobj.coins == 0:
-                break
-            if obstacle_.hit is False:
-                hit = mixer.Sound(f"{gameobj.media}/hit.ogg")
-                hit.play()
-                gameobj.coins -= 1
-                obstacle_.hit = True
-
-        if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup == "coin":
-            if gameobj.coins < gameobj.maxcoins and obstacle_.hit is False:
-                gameobj.coins += 1
-                coin = mixer.Sound(f"{gameobj.media}/coin.ogg")
-                coin.play()
-                obstacle_.hit = True
+        if handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_) is True:
+            break
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -267,6 +283,7 @@ def main():
         menu(screen, gameobj, clock, background, text=text)
         mainloop(gameobj, clock, background, screen)
         text = "Neustart"
+
 
 if __name__ == "__main__":
     main()
