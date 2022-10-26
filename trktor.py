@@ -21,7 +21,7 @@ class obstacle:
     height: int
     width: int
     x: int
-    y: int = 628
+    y: int = 460
     powerup: str = None
     hit: bool = False
 
@@ -38,9 +38,9 @@ class surface:
 @dataclass
 class game:
     screen_w: int = 800
-    screen_h: int = 800
+    screen_h: int = 600
     fps: int = 60
-    jump_height: int = 22
+    jump_height: int = 18
     y_gravity: float = 0.6
     y_velocity = jump_height
     scroll: int = 0
@@ -62,9 +62,9 @@ class vehicle:
     asset: str
     height: int
     width: int
-    y: int = 650
+    y: int = 480
     x: int = 200
-    y_start: int = 650
+    y_start: int = 480
     x_start: int = 200
 
 
