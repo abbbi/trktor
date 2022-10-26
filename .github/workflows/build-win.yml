@@ -7,4 +7,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: powershell -c build_windows.ps1
+        run: powershell -File .\build_windows.ps1
+      - uses: actions/upload-artifact@v3
+        with:
+          name: trktor.exe
+          path: ${{ github.workspace }}/dist/
