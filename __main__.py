@@ -73,11 +73,11 @@ def load_vehicles(path):
     return vehicles
 
 
-def menu(screen, gameobj, clock, background):
+def menu(screen, gameobj, background):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
     myimage = pygame_menu.baseimage.BaseImage(
-        image_path=f"{gameobj.media}/worlds/0/img.png",
+        image_path=background,
     )
     mytheme = pygame_menu.themes.THEME_ORANGE.copy()
     mytheme.title_background_color = (0, 0, 0)
@@ -278,7 +278,7 @@ def main():
     while True:
         gameobj = game()
         gameobj.platform_height = world.y
-        menu(screen, gameobj, clock, background)
+        menu(screen, gameobj, worlds[1].asset)
         mainloop(gameobj, clock, background, screen)
 
 
