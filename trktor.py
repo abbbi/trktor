@@ -130,7 +130,7 @@ def load_vehicles(path):
     return vehicles
 
 
-def menu(screen, gameobj, clock, background, text="Start"):
+def menu(screen, gameobj, clock, background):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
     myimage = pygame_menu.baseimage.BaseImage(
@@ -328,16 +328,13 @@ def main():
     world = worlds[random.randrange(0, len(worlds))]
     background = pygame.image.load(world.asset)
     screen.blit(background, (0, 0))
-    text = "Start"
 
     start_time = datetime.now()
     while True:
         gameobj = game()
         gameobj.platform_height = world.y
-        menu(screen, gameobj, clock, background, text=text)
+        menu(screen, gameobj, clock, background)
         mainloop(gameobj, clock, background, screen)
-        text = "Neustart"
-
 
 if __name__ == "__main__":
     main()
