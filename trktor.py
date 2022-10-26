@@ -3,6 +3,7 @@
 Simons jump game
 """
 import sys
+import copy
 import math
 from datetime import datetime
 from dataclasses import dataclass
@@ -49,6 +50,7 @@ class game:
     jumps: bool = False
     media = "assets/"
     media_obstacles = f"{media}/obstacles/"
+    media_vehicles = f"{media}/vehicles/"
     coins: int = 3
     maxcoins: int = coins
     hit_sounnd: object = None
@@ -60,9 +62,9 @@ class vehicle:
     asset: str
     height: int
     width: int
-    y: int = 660
+    y: int = 650
     x: int = 200
-    y_start: int = 660
+    y_start: int = 650
     x_start: int = 200
 
 
@@ -85,6 +87,23 @@ def load_obstacles(path):
         obstacles.append(this)
 
     return obstacles
+
+
+def load_vehicles(path):
+    vehicles = []
+    for odir in glob(f"{path}/*/"):
+        print(f"{odir}/info.json")
+        with open(f"{odir}/info.json", "r") as j:
+            info = json.loads(j.read())
+        this = vehicle(
+            asset=f"{odir}/img.png",
+            width=info["width"],
+            height=info["height"],
+            x=info["x"],
+        )
+        vehicles.append(this)
+
+    return vehicles
 
 
 def button(screen, position, text):
@@ -172,17 +191,21 @@ def mainloop(gameobj, clock, background, screen):
     gameobj.coin_sound = mixer.Sound(f"{gameobj.media}/coin.ogg")
     gameobj.hit_sound = mixer.Sound(f"{gameobj.media}/hit.ogg")
 
-    vh_standing = vehicle(asset="assets/trktor_standing.png", height=99, width=64)
+    obstacles = load_obstacles(game.media_obstacles)
+    vehicles = load_vehicles(game.media_vehicles)
+
+    thisvehicle = vehicles[random.randrange(0, len(vehicles))]
+
+    vh_standing = thisvehicle
+    vh_jumping = copy.copy(thisvehicle)
+    vh_jumping.height = 66
+    vh_jumping.width = 44
+
     vhsf_standing = pygame.transform.scale(
         pygame.image.load(
             vh_standing.asset,
         ),
         (vh_standing.height, vh_standing.width),
-    )
-    vh_jumping = vehicle(
-        asset="assets/trktor_jumping.png",
-        height=77,
-        width=64,
     )
     vhsf_jumping = pygame.transform.scale(
         pygame.image.load(
@@ -190,7 +213,7 @@ def mainloop(gameobj, clock, background, screen):
         ),
         (vh_jumping.height, vh_jumping.width),
     )
-    obstacles = load_obstacles(game.media_obstacles)
+
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
     obstaclesf = pygame.transform.scale(
         pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
@@ -198,6 +221,7 @@ def mainloop(gameobj, clock, background, screen):
     background_width = background.get_width()
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
     vehicle_rect = vhsf_standing.get_rect(center=(vehicle.x, vehicle.y))
+
     obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, obstacle_.y))
     obstacle_rect.y = obstacle_.y
     obstacle_rect.x = obstacle_.x
