@@ -21,9 +21,14 @@ class obstacle:
     height: int
     width: int
     x: int
-    y: int = 460
     powerup: str = None
     hit: bool = False
+
+
+@dataclass
+class world:
+    asset: str
+    y: int = 0
 
 
 @dataclass
@@ -40,7 +45,7 @@ class game:
     screen_w: int = 800
     screen_h: int = 600
     fps: int = 60
-    jump_height: int = 18
+    jump_height: int = 19
     y_gravity: float = 0.6
     y_velocity = jump_height
     scroll: int = 0
@@ -51,10 +56,12 @@ class game:
     media = "assets/"
     media_obstacles = f"{media}/obstacles/"
     media_vehicles = f"{media}/vehicles/"
+    media_worlds = f"{media}/worlds/"
     coins: int = 3
     maxcoins: int = coins
-    hit_sounnd: object = None
-    coin_sounnd: object = None
+    hit_sound: object = None
+    coin_sound: object = None
+    platform_height: int = 0
 
 
 @dataclass
@@ -62,9 +69,8 @@ class vehicle:
     asset: str
     height: int
     width: int
-    y: int = 480
+    y: int = 0
     x: int = 200
-    y_start: int = 480
     x_start: int = 200
 
 
@@ -87,6 +93,21 @@ def load_obstacles(path):
         obstacles.append(this)
 
     return obstacles
+
+
+def load_worlds(path):
+    worlds = []
+    for odir in glob(f"{path}/*/"):
+        print(f"{odir}/info.json")
+        with open(f"{odir}/info.json", "r") as j:
+            info = json.loads(j.read())
+        this = world(
+            asset=f"{odir}/img.png",
+            y=info["y"],
+        )
+        worlds.append(this)
+
+    return worlds
 
 
 def load_vehicles(path):
@@ -153,7 +174,7 @@ def draw_coins(screen, gameobj, vh_jumping):
         s += coin.width + 20
 
 
-def spawn_obstacle(obstaclesf, obstacle_rect, obstacles):
+def spawn_obstacle(gameobj, obstaclesf, obstacle_rect, obstacles):
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
     obstaclesf = pygame.transform.scale(
         pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
@@ -161,7 +182,7 @@ def spawn_obstacle(obstaclesf, obstacle_rect, obstacles):
     if obstacle_.powerup is not None:
         obstacle_rect.y = random.randrange(200, 300)
     else:
-        obstacle_rect.y = obstacle_.y
+        obstacle_rect.y = gameobj.platform_height - 20
     obstacle_rect.x = obstacle_.x
     obstacle_.hit = False
     return obstacle_, obstaclesf
@@ -195,6 +216,7 @@ def mainloop(gameobj, clock, background, screen):
     vehicles = load_vehicles(game.media_vehicles)
 
     thisvehicle = vehicles[random.randrange(0, len(vehicles))]
+    thisvehicle.y = gameobj.platform_height
 
     vh_standing = thisvehicle
     vh_jumping = copy.copy(thisvehicle)
@@ -220,16 +242,16 @@ def mainloop(gameobj, clock, background, screen):
     )
     background_width = background.get_width()
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
-    vehicle_rect = vhsf_standing.get_rect(center=(vehicle.x, vehicle.y))
+    vehicle_rect = vhsf_standing.get_rect(center=(thisvehicle.x_start, thisvehicle.y))
 
-    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, obstacle_.y))
-    obstacle_rect.y = obstacle_.y
+    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, gameobj.platform_height))
+    obstacle_rect.y = gameobj.platform_height - 20
     obstacle_rect.x = obstacle_.x
 
     while True:
         if obstacle_rect.x <= 5:
             (obstacle_, obstaclesf) = spawn_obstacle(
-                obstaclesf, obstacle_rect, obstacles
+                gameobj, obstaclesf, obstacle_rect, obstacles
             )
 
         if handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_) is True:
@@ -252,7 +274,6 @@ def mainloop(gameobj, clock, background, screen):
         obstacle_rect.x -= 3
         if obstacle_rect.x < 0:
             obstacle_rect.x = obstacle_.x
-            obstacle_rect.y = obstacle_.y
 
         screen.blit(obstaclesf, obstacle_rect)
 
@@ -262,7 +283,7 @@ def mainloop(gameobj, clock, background, screen):
             gameobj.scroll = 0
 
         if gameobj.jumps:
-            vehicle.y -= gameobj.y_velocity
+            thisvehicle.y -= gameobj.y_velocity
             gameobj.y_velocity -= gameobj.y_gravity
             if gameobj.y_velocity < -gameobj.jump_height:
                 gameobj.jumps = False
@@ -270,14 +291,14 @@ def mainloop(gameobj, clock, background, screen):
 
             vehicle_rect = vhsf_jumping.get_rect(
                 center=(
-                    vehicle.x,
-                    vehicle.y,
+                    thisvehicle.x_start,
+                    thisvehicle.y,
                 )
             )
             screen.blit(vhsf_jumping, vehicle_rect)
         else:
             vehicle_rect = vhsf_jumping.get_rect(
-                center=(vehicle.x_start, vehicle.y_start)
+                center=(thisvehicle.x_start, gameobj.platform_height)
             )
             screen.blit(vhsf_standing, vehicle_rect)
 
@@ -297,13 +318,16 @@ def main():
     screen = pygame.display.set_mode((game.screen_w, game.screen_h))
     pygame.display.set_caption(game.caption)
 
-    background = pygame.image.load("assets/background.png")
+    worlds = load_worlds(game.media_worlds)
+    world = worlds[random.randrange(0, len(worlds))]
+    background = pygame.image.load(world.asset)
     screen.blit(background, (0, 0))
     text = "Start"
 
     start_time = datetime.now()
     while True:
         gameobj = game()
+        gameobj.platform_height = world.y
         menu(screen, gameobj, clock, background, text=text)
         mainloop(gameobj, clock, background, screen)
         text = "Neustart"
