@@ -16,6 +16,7 @@ from pygame import mixer
 
 from objects import obstacle, world, surface, game, vehicle
 
+
 def load_obstacles(path):
     obstacles = []
     for odir in glob(f"{path}/*/"):
@@ -70,17 +71,21 @@ def load_vehicles(path):
     return vehicles
 
 
-def menu(screen, gameobj, background):
+def menu(screen, gameobj):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
-    myimage = pygame_menu.baseimage.BaseImage(
-        image_path=background,
-    )
+    worlds = load_worlds(game.media_worlds)
+    gameobj.world = worlds[2]
+
+    vehicles = load_vehicles(game.media_vehicles)
+    gameobj.vehicle = vehicles[random.randrange(0, len(vehicles))]
+
+    myimage = pygame_menu.baseimage.BaseImage(image_path=gameobj.world.asset)
     mytheme = pygame_menu.themes.THEME_ORANGE.copy()
     mytheme.title_background_color = (0, 0, 0)
     mytheme.background_color = myimage
 
-    menu = pygame_menu.Menu(
+    mymenu = pygame_menu.Menu(
         height=gameobj.screen_h, theme=mytheme, title="Trktor", width=gameobj.screen_w
     )
 
@@ -89,17 +94,27 @@ def menu(screen, gameobj, background):
         gameobj.jump_height -= 3
 
     def set_tractor(one, two):
-        gameobj.vehicle = two
+        if two is not None:
+            gameobj.vehicle = vehicles[two]
+            print(gameobj.vehicle)
 
-    menu.add.selector(
+    def set_world(one, two):
+        gameobj.world = worlds[two]
+        gameobj.platform_height = gameobj.world.y
+
+    mymenu.add.selector(
         "Modus: ", [("Einfach", 0), ("Schwer", 10)], onchange=set_difficulty
     )
-    menu.add.selector(
-        "Traktor:", [("Egal", None), ("Gruen", 0), ("Rot", 1)], onchange=set_tractor
+    mymenu.add.selector(
+        "Traktor:", [("Egal", None), ("Gruen", 1), ("Rot", 0)], onchange=set_tractor
     )
-    menu.add.button("Spiel Starten", menu.disable)
-    menu.add.button("Quit", pygame_menu.events.EXIT)
-    menu.mainloop(screen)
+    mymenu.add.selector(
+        "Welt", [("Himmel", 2), ("Wald", 1), ("Hoele", 0)], onchange=set_world
+    )
+
+    mymenu.add.button("Spiel Starten", mymenu.disable)
+    mymenu.add.button("Quit", pygame_menu.events.EXIT)
+    mymenu.mainloop(screen)
 
 
 def draw_coins(screen, gameobj, vh_jumping):
@@ -111,7 +126,7 @@ def draw_coins(screen, gameobj, vh_jumping):
     )
 
     s = vh_jumping.width
-    for c in range(0, gameobj.coins):
+    for _ in range(0, gameobj.coins):
         coin_rect = coinsf.get_rect(center=(s, 45))
         screen.blit(coinsf, coin_rect)
         s += vh_jumping.width + 20
@@ -145,24 +160,25 @@ def handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_):
             gameobj.coins += 1
             gameobj.coin_sound.play()
             obstacle_.hit = True
+            # move coin to position 3 so it appears the vehicle
+            # has "consumed" it.
+            obstacle_rect.x = 3
 
     return False
 
 
-def mainloop(gameobj, clock, background, screen):
+def mainloop(gameobj, clock, screen):
     gameobj.coin_sound = mixer.Sound(f"{gameobj.media}/coin.ogg")
     gameobj.hit_sound = mixer.Sound(f"{gameobj.media}/hit.ogg")
+    background = draw_background(screen, gameobj.world.asset)
 
     obstacles = load_obstacles(game.media_obstacles)
-    vehicles = load_vehicles(game.media_vehicles)
 
-    thisvehicle = vehicles[random.randrange(0, len(vehicles))]
-    if gameobj.vehicle is not None:
-        thisvehicle = vehicles[gameobj.vehicle]
+    thisvehicle = gameobj.vehicle
     thisvehicle.y = gameobj.platform_height
 
     mixer.music.load(thisvehicle.sound)
-    mixer.music.play()
+    mixer.music.play(loops=-1)
 
     vh_standing = thisvehicle
     vh_jumping = copy.copy(thisvehicle)
@@ -183,8 +199,10 @@ def mainloop(gameobj, clock, background, screen):
     )
 
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
-    obstaclesf = pygame.transform.scale(
-        pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
+    obstaclesf = copy.copy(
+        pygame.transform.scale(
+            pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
+        )
     )
     background_width = background.get_width()
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
@@ -270,19 +288,14 @@ def main():
     screen = pygame.display.set_mode((game.screen_w, game.screen_h))
     pygame.display.set_caption(game.caption)
 
-    worlds = load_worlds(game.media_worlds)
-    world = worlds[random.randrange(0, len(worlds))]
-
-    background = draw_background(screen, world.asset)
-
     print(game.media)
 
     start_time = datetime.now()
     while True:
         gameobj = game()
-        gameobj.platform_height = world.y
-        menu(screen, gameobj, worlds[1].asset)
-        mainloop(gameobj, clock, background, screen)
+        menu(screen, gameobj)
+        gameobj.platform_height = gameobj.world.y
+        mainloop(gameobj, clock, screen)
 
 
 if __name__ == "__main__":

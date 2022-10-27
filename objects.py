@@ -58,6 +58,7 @@ class game:
     coin_sound: object = None
     platform_height: int = 0
     vehicle: object = None
+    world: object = None
 
 
 @dataclass
