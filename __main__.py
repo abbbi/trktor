@@ -258,6 +258,11 @@ def mainloop(gameobj, clock, screen):
             screen.blit(vhsf_standing, vehicle_rect)
 
         draw_coins(screen, gameobj, vh_jumping)
+
+        font = pygame.font.SysFont(None, 24)
+        img = font.render(f"FPS: [{int(clock.get_fps())}]", True, (0, 0, 0))
+        screen.blit(img, (690, 10))
+
         pygame.display.update()
         clock.tick(gameobj.fps)
 
