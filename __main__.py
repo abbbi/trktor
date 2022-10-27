@@ -205,6 +205,7 @@ def mainloop(gameobj, clock, screen):
     ##
     spawned = spawn_obstacle(gameobj, obstacles)
     jump = mixer.Sound(f"{gameobj.media}/jump.ogg")
+    font = pygame.font.Font(f"{gameobj.media}/freesansbold.ttf", 24)
 
     while True:
         if spawned.rect.x <= 5:
@@ -259,7 +260,6 @@ def mainloop(gameobj, clock, screen):
 
         draw_coins(screen, gameobj, vh_jumping)
 
-        font = pygame.font.SysFont(None, 24)
         img = font.render(f"FPS: [{int(clock.get_fps())}]", True, (0, 0, 0))
         screen.blit(img, (690, 10))
 
