@@ -24,6 +24,7 @@ class obstacle:
 class world:
     asset: str
     y: int = 0
+    name: str = None
 
 
 @dataclass
@@ -67,6 +68,7 @@ class vehicle:
     height: int
     width: int
     sound: str
+    name: str
     y: int = 0
     x: int = 200
     x_start: int = 200

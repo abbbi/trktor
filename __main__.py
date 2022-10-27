@@ -43,10 +43,7 @@ def load_worlds(path):
     for odir in sorted(glob(f"{path}/*/"), key=len):
         with open(f"{odir}/info.json", "r") as j:
             info = json.loads(j.read())
-        this = world(
-            asset=f"{odir}/img.png",
-            y=info["y"],
-        )
+        this = world(asset=f"{odir}/img.png", y=info["y"], name=info["name"])
         worlds.append(this)
 
     return worlds
@@ -63,6 +60,7 @@ def load_vehicles(path):
             width=info["width"],
             height=info["height"],
             x=info["x"],
+            name=info["name"],
         )
         vehicles.append(this)
 
@@ -72,13 +70,15 @@ def load_vehicles(path):
 def menu(screen, gameobj):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
-    worlds = load_worlds(game.media_worlds)
-    gameobj.world = worlds[2]
 
+    worlds = load_worlds(game.media_worlds)
     vehicles = load_vehicles(game.media_vehicles)
+
+    # defaults
+    gameobj.world = worlds[random.randrange(0, len(worlds))]
     gameobj.vehicle = vehicles[random.randrange(0, len(vehicles))]
 
-    myimage = pygame_menu.baseimage.BaseImage(image_path=gameobj.world.asset)
+    myimage = pygame_menu.baseimage.BaseImage(image_path=f"{gameobj.media}/menu.png")
     mytheme = pygame_menu.themes.THEME_ORANGE.copy()
     mytheme.title_background_color = (0, 0, 0)
     mytheme.background_color = myimage
@@ -97,18 +97,25 @@ def menu(screen, gameobj):
             print(gameobj.vehicle)
 
     def set_world(one, two):
-        gameobj.world = worlds[two]
-        gameobj.platform_height = gameobj.world.y
+        if two is not None:
+            gameobj.world = worlds[two]
+            gameobj.platform_height = gameobj.world.y
+            print(gameobj.world)
 
     mymenu.add.selector(
         "Modus: ", [("Einfach", 0), ("Schwer", 10)], onchange=set_difficulty
     )
-    mymenu.add.selector(
-        "Traktor:", [("Egal", None), ("Gruen", 1), ("Rot", 0)], onchange=set_tractor
-    )
-    mymenu.add.selector(
-        "Welt", [("Himmel", 2), ("Wald", 1), ("Hoele", 0)], onchange=set_world
-    )
+
+    vhlist = []
+    vhlist.append(("Egal", None))
+    for idx, x in enumerate(vehicles):
+        vhlist.append((x.name, idx))
+    mymenu.add.selector("Traktor:", vhlist, onchange=set_tractor)
+    wlist = []
+    wlist.append(("Egal", None))
+    for idx, x in enumerate(worlds):
+        wlist.append((x.name, idx))
+    mymenu.add.selector("Welt", wlist, onchange=set_world)
 
     mymenu.add.button("Spiel Starten", mymenu.disable)
     mymenu.add.button("Quit", pygame_menu.events.EXIT)
