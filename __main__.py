@@ -232,6 +232,11 @@ def mainloop(gameobj, clock, screen):
         if abs(gameobj.scroll) > background_width:
             gameobj.scroll = 0
 
+        if spawned.obstacle.hit is True and spawned.obstacle.powerup is None:
+            spawned.rect.y -= gameobj.y_velocity
+            gameobj.y_velocity -= gameobj.y_gravity
+            screen.blit(spawned.sf, spawned.rect)
+
         if gameobj.jumps:
             thisvehicle.y -= gameobj.y_velocity
             gameobj.y_velocity -= gameobj.y_gravity
