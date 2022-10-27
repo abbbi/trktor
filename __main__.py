@@ -206,6 +206,7 @@ def mainloop(gameobj, clock, screen):
     # spawn first obstacle
     ##
     spawned = spawn_obstacle(gameobj, obstacles)
+    jump = mixer.Sound(f"{gameobj.media}/jump.ogg")
 
     while True:
         if spawned.rect.x <= 5:
@@ -214,15 +215,11 @@ def mainloop(gameobj, clock, screen):
         if handle_collide(gameobj, vehicle_rect, spawned) is True:
             break
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+        pygame.event.get()
 
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_SPACE]:
             gameobj.jumps = True
-            jump = mixer.Sound(f"{gameobj.media}/jump.ogg")
             jump.play()
         if keys_pressed[pygame.K_ESCAPE]:
             sys.exit(1)
@@ -264,7 +261,7 @@ def mainloop(gameobj, clock, screen):
 
         draw_coins(screen, gameobj, vh_jumping)
         pygame.display.update()
-        clock.tick(gameobj.fps)
+        print(clock.tick(gameobj.fps))
 
     mixer.music.stop()
     crash = mixer.Sound(f"{gameobj.media}/crash.ogg")
@@ -278,8 +275,9 @@ def draw_background(screen, asset):
 
 
 def main():
+    mixer.pre_init()
     pygame.init()
-    mixer.init()
+    pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((game.screen_w, game.screen_h))
     pygame.display.set_caption(game.caption)
