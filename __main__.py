@@ -137,16 +137,19 @@ def draw_coins(screen, gameobj, vh_jumping):
         s += vh_jumping.width + 20
 
 
-def spawn_obstacle(gameobj, obstaclesf, obstacle_rect, obstacles):
+def spawn_obstacle(gameobj, obstacles):
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
     obstaclesf = getsf(obstacle_)
+
+    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, gameobj.platform_height))
+
     if obstacle_.powerup is not None:
         obstacle_rect.y = random.randrange(200, 300)
     else:
         obstacle_rect.y = gameobj.platform_height - 30
     obstacle_rect.x = obstacle_.x
     obstacle_.hit = False
-    return obstacle_, obstaclesf
+    return obstacle_, obstaclesf, obstacle_rect
 
 
 def handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_):
@@ -191,21 +194,16 @@ def mainloop(gameobj, clock, screen):
     vhsf_standing = getsf(vh_standing)
     vhsf_jumping = getsf(vh_jumping)
 
-    obstacle_ = obstacles[random.randrange(0, len(obstacles))]
-    obstaclesf = copy.copy(getsf(obstacle_))
     background_width = background.get_width()
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
+
     vehicle_rect = vhsf_standing.get_rect(center=(thisvehicle.x_start, thisvehicle.y))
 
-    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, gameobj.platform_height))
-    obstacle_rect.y = gameobj.platform_height - 30
-    obstacle_rect.x = obstacle_.x
+    (obstacle_, obstaclesf, obstacle_rect) = spawn_obstacle(gameobj, obstacles)
 
     while True:
         if obstacle_rect.x <= 5:
-            (obstacle_, obstaclesf) = spawn_obstacle(
-                gameobj, obstaclesf, obstacle_rect, obstacles
-            )
+            (obstacle_, obstaclesf, obstacle_rect) = spawn_obstacle(gameobj, obstacles)
 
         if handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_) is True:
             break
