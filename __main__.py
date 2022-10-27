@@ -20,7 +20,6 @@ from objects import obstacle, spawnedobstacle, world, surface, game, vehicle
 def load_obstacles(path):
     obstacles = []
     for odir in glob(f"{path}/*/"):
-        print(f"{odir}/info.json")
         with open(f"{odir}/info.json", "r") as j:
             info = json.loads(j.read())
         this = obstacle(
@@ -94,13 +93,11 @@ def menu(screen, gameobj):
     def set_tractor(one, two):
         if two is not None:
             gameobj.vehicle = vehicles[two]
-            print(gameobj.vehicle)
 
     def set_world(one, two):
         if two is not None:
             gameobj.world = worlds[two]
             gameobj.platform_height = gameobj.world.y
-            print(gameobj.world)
 
     mymenu.add.selector(
         "Modus: ", [("Einfach", 0), ("Schwer", 10)], onchange=set_difficulty
@@ -135,6 +132,7 @@ def draw_coins(screen, gameobj, vh_jumping):
         coin_rect = coinsf.get_rect(center=(s, 45))
         screen.blit(coinsf, coin_rect)
         s += vh_jumping.width + 20
+        screen.blit(coinsf, coin_rect)
 
 
 def spawn_obstacle(gameobj, obstacles):
@@ -261,7 +259,7 @@ def mainloop(gameobj, clock, screen):
 
         draw_coins(screen, gameobj, vh_jumping)
         pygame.display.update()
-        print(clock.tick(gameobj.fps))
+        clock.tick(gameobj.fps)
 
     mixer.music.stop()
     crash = mixer.Sound(f"{gameobj.media}/crash.ogg")
@@ -280,9 +278,8 @@ def main():
     pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((game.screen_w, game.screen_h))
+    screen.set_alpha(None)
     pygame.display.set_caption(game.caption)
-
-    print(game.media)
 
     start_time = datetime.now()
     while True:
