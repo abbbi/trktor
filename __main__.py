@@ -150,7 +150,12 @@ def spawn_obstacle(gameobj, obstacles):
     obstacle_rect.x = obstacle_.x
     obstacle_.hit = False
 
-    return spawnedobstacle(obstacle=obstacle_, sf=obstaclesf, rect=obstacle_rect)
+    return spawnedobstacle(
+        obstacle=obstacle_,
+        sf=obstaclesf,
+        rect=obstacle_rect,
+        velocity=gameobj.y_velocity,
+    )
 
 
 def handle_collide(gameobj, vehicle_rect, spawned):
@@ -233,9 +238,8 @@ def mainloop(gameobj, clock, screen):
             gameobj.scroll = 0
 
         if spawned.obstacle.hit is True and spawned.obstacle.powerup is None:
-            spawned.rect.y -= gameobj.y_velocity
-            if spawned.rect.y <= gameobj.jump_height:
-                spawned.rect.y=-200
+            spawned.rect.y -= spawned.velocity
+            spawned.velocity -= gameobj.y_gravity
             screen.blit(spawned.sf, spawned.rect)
 
         if gameobj.jumps:

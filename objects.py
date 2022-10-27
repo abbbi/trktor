@@ -24,6 +24,7 @@ class spawnedobstacle:
     obstacle: object
     sf: object
     rect: object
+    velocity: int
 
 @dataclass
 class world:
