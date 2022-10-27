@@ -178,28 +178,28 @@ def mainloop(gameobj, clock, screen):
     gameobj.coin_sound = mixer.Sound(f"{gameobj.media}/coin.ogg")
     gameobj.hit_sound = mixer.Sound(f"{gameobj.media}/hit.ogg")
     background = draw_background(screen, gameobj.world.asset)
-
     obstacles = load_obstacles(game.media_obstacles)
+    background_width = background.get_width()
+    gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
 
+    ##
+    # draw vehicle, play sound
+    ##
     thisvehicle = gameobj.vehicle
     thisvehicle.y = gameobj.platform_height
-
-    mixer.music.load(thisvehicle.sound)
-    mixer.music.play(loops=-1)
-
     vh_standing = thisvehicle
     vh_jumping = copy.copy(thisvehicle)
     vh_jumping.height = 66
     vh_jumping.width = 44
-
     vhsf_standing = getsf(vh_standing)
     vhsf_jumping = getsf(vh_jumping)
-
-    background_width = background.get_width()
-    gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
-
     vehicle_rect = vhsf_standing.get_rect(center=(thisvehicle.x_start, thisvehicle.y))
+    mixer.music.load(thisvehicle.sound)
+    mixer.music.play(loops=-1)
 
+    ##
+    # spawn first obstacle
+    ##
     spawned = spawn_obstacle(gameobj, obstacles)
 
     while True:
