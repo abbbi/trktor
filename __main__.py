@@ -227,11 +227,7 @@ def mainloop(gameobj, clock, screen):
             screen.blit(background, (i * background_width + gameobj.scroll, 0))
 
         obstacle_rect.x -= 3
-        if obstacle_rect.x < 0:
-            obstacle_rect.x = obstacle_.x
-
         screen.blit(obstaclesf, obstacle_rect)
-
         gameobj.scroll -= gameobj.scrollstep
 
         if abs(gameobj.scroll) > background_width:
