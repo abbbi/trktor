@@ -234,7 +234,8 @@ def mainloop(gameobj, clock, screen):
 
         if spawned.obstacle.hit is True and spawned.obstacle.powerup is None:
             spawned.rect.y -= gameobj.y_velocity
-            gameobj.y_velocity -= gameobj.y_gravity
+            if spawned.rect.y <= gameobj.jump_height:
+                spawned.rect.y=-200
             screen.blit(spawned.sf, spawned.rect)
 
         if gameobj.jumps:
