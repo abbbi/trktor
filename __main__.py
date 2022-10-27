@@ -40,8 +40,7 @@ def load_obstacles(path):
 
 def load_worlds(path):
     worlds = []
-    for odir in glob(f"{path}/*/"):
-        print(f"{odir}/info.json")
+    for odir in sorted(glob(f"{path}/*/"), key=len):
         with open(f"{odir}/info.json", "r") as j:
             info = json.loads(j.read())
         this = world(
@@ -55,8 +54,7 @@ def load_worlds(path):
 
 def load_vehicles(path):
     vehicles = []
-    for odir in glob(f"{path}/*/"):
-        print(f"{odir}/info.json")
+    for odir in sorted(glob(f"{path}/*/"), key=len):
         with open(f"{odir}/info.json", "r") as j:
             info = json.loads(j.read())
         this = vehicle(
