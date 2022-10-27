@@ -122,14 +122,14 @@ def menu(screen, gameobj):
     mymenu.mainloop(screen)
 
 
-def draw_coins(screen, gameobj, vh_jumping):
-    coinsf = pygame.transform.scale(
-        pygame.image.load(
-            vh_jumping.asset,
-        ),
-        (vh_jumping.height, vh_jumping.width),
+def getsf(item):
+    return pygame.transform.scale(
+        pygame.image.load(item.asset), (item.height, item.width)
     )
 
+
+def draw_coins(screen, gameobj, vh_jumping):
+    coinsf = getsf(vh_jumping)
     s = vh_jumping.width
     for _ in range(0, gameobj.coins):
         coin_rect = coinsf.get_rect(center=(s, 45))
@@ -139,9 +139,7 @@ def draw_coins(screen, gameobj, vh_jumping):
 
 def spawn_obstacle(gameobj, obstaclesf, obstacle_rect, obstacles):
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
-    obstaclesf = pygame.transform.scale(
-        pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
-    )
+    obstaclesf = getsf(obstacle_)
     if obstacle_.powerup is not None:
         obstacle_rect.y = random.randrange(200, 300)
     else:
@@ -190,25 +188,11 @@ def mainloop(gameobj, clock, screen):
     vh_jumping.height = 66
     vh_jumping.width = 44
 
-    vhsf_standing = pygame.transform.scale(
-        pygame.image.load(
-            vh_standing.asset,
-        ),
-        (vh_standing.height, vh_standing.width),
-    )
-    vhsf_jumping = pygame.transform.scale(
-        pygame.image.load(
-            vh_jumping.asset,
-        ),
-        (vh_jumping.height, vh_jumping.width),
-    )
+    vhsf_standing = getsf(vh_standing)
+    vhsf_jumping = getsf(vh_jumping)
 
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
-    obstaclesf = copy.copy(
-        pygame.transform.scale(
-            pygame.image.load(obstacle_.asset), (obstacle_.width, obstacle_.height)
-        )
-    )
+    obstaclesf = copy.copy(getsf(obstacle_))
     background_width = background.get_width()
     gameobj.tiles = math.ceil(game.screen_w / background_width) + 1
     vehicle_rect = vhsf_standing.get_rect(center=(thisvehicle.x_start, thisvehicle.y))
@@ -236,6 +220,8 @@ def mainloop(gameobj, clock, screen):
             gameobj.jumps = True
             jump = mixer.Sound(f"{gameobj.media}/jump.ogg")
             jump.play()
+        if keys_pressed[pygame.K_ESCAPE]:
+            sys.exit(1)
 
         for i in range(0, gameobj.tiles):
             screen.blit(background, (i * background_width + gameobj.scroll, 0))
