@@ -19,6 +19,11 @@ class obstacle:
     powerup: str = None
     hit: bool = False
 
+@dataclass
+class spawnedobstacle:
+    obstacle: object
+    sf: object
+    rect: object
 
 @dataclass
 class world:

@@ -14,7 +14,7 @@ import pygame
 import pygame_menu
 from pygame import mixer
 
-from objects import obstacle, world, surface, game, vehicle
+from objects import obstacle, spawnedobstacle, world, surface, game, vehicle
 
 
 def load_obstacles(path):
@@ -149,26 +149,27 @@ def spawn_obstacle(gameobj, obstacles):
         obstacle_rect.y = gameobj.platform_height - 30
     obstacle_rect.x = obstacle_.x
     obstacle_.hit = False
-    return obstacle_, obstaclesf, obstacle_rect
+
+    return spawnedobstacle(obstacle=obstacle_, sf=obstaclesf, rect=obstacle_rect)
 
 
-def handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_):
-    if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup is None:
+def handle_collide(gameobj, vehicle_rect, spawned):
+    if vehicle_rect.colliderect(spawned.rect) and spawned.obstacle.powerup is None:
         if gameobj.coins == 0:
             return True
-        if obstacle_.hit is False:
+        if spawned.obstacle.hit is False:
             gameobj.hit_sound.play()
             gameobj.coins -= 1
-            obstacle_.hit = True
+            spawned.obstacle.hit = True
 
-    if vehicle_rect.colliderect(obstacle_rect) and obstacle_.powerup == "coin":
-        if gameobj.coins < gameobj.maxcoins and obstacle_.hit is False:
+    if vehicle_rect.colliderect(spawned.rect) and spawned.obstacle.powerup == "coin":
+        if gameobj.coins < gameobj.maxcoins and spawned.obstacle.hit is False:
             gameobj.coins += 1
             gameobj.coin_sound.play()
-            obstacle_.hit = True
+            spawned.obstacle.hit = True
             # move coin to position 3 so it appears the vehicle
             # has "consumed" it.
-            obstacle_rect.x = 3
+            spawned.rect.x = 3
 
     return False
 
@@ -199,13 +200,13 @@ def mainloop(gameobj, clock, screen):
 
     vehicle_rect = vhsf_standing.get_rect(center=(thisvehicle.x_start, thisvehicle.y))
 
-    (obstacle_, obstaclesf, obstacle_rect) = spawn_obstacle(gameobj, obstacles)
+    spawned = spawn_obstacle(gameobj, obstacles)
 
     while True:
-        if obstacle_rect.x <= 5:
-            (obstacle_, obstaclesf, obstacle_rect) = spawn_obstacle(gameobj, obstacles)
+        if spawned.rect.x <= 5:
+            spawned = spawn_obstacle(gameobj, obstacles)
 
-        if handle_collide(gameobj, vehicle_rect, obstacle_rect, obstacle_) is True:
+        if handle_collide(gameobj, vehicle_rect, spawned) is True:
             break
 
         for event in pygame.event.get():
@@ -224,8 +225,8 @@ def mainloop(gameobj, clock, screen):
         for i in range(0, gameobj.tiles):
             screen.blit(background, (i * background_width + gameobj.scroll, 0))
 
-        obstacle_rect.x -= 3
-        screen.blit(obstaclesf, obstacle_rect)
+        spawned.rect.x -= 3
+        screen.blit(spawned.sf, spawned.rect)
         gameobj.scroll -= gameobj.scrollstep
 
         if abs(gameobj.scroll) > background_width:
