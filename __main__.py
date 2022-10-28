@@ -27,6 +27,7 @@ def load_obstacles(path):
             width=info["width"],
             height=info["height"],
             x=info["x"],
+            image=pygame.image.load(f"{odir}/img.png"),
         )
         try:
             this.powerup = info["powerup"]
@@ -60,6 +61,7 @@ def load_vehicles(path):
             height=info["height"],
             x=info["x"],
             name=info["name"],
+            image=pygame.image.load(f"{odir}/img.png"),
         )
         vehicles.append(this)
 
@@ -120,9 +122,7 @@ def menu(screen, gameobj):
 
 
 def getsf(item):
-    return pygame.transform.scale(
-        pygame.image.load(item.asset), (item.height, item.width)
-    )
+    return pygame.transform.scale(item.image, (item.height, item.width))
 
 
 def draw_coins(screen, gameobj, vh_jumping):

@@ -18,6 +18,7 @@ class obstacle:
     x: int
     powerup: str = None
     hit: bool = False
+    image: object = None
 
 @dataclass
 class spawnedobstacle:
@@ -78,3 +79,4 @@ class vehicle:
     y: int = 0
     x: int = 200
     x_start: int = 200
+    image: object = None
