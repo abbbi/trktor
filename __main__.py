@@ -132,7 +132,6 @@ def draw_coins(screen, gameobj, vh_jumping):
         coin_rect = coinsf.get_rect(center=(s, 45))
         screen.blit(coinsf, coin_rect)
         s += vh_jumping.width + 20
-        screen.blit(coinsf, coin_rect)
 
 
 def spawn_obstacle(gameobj, obstacles):
@@ -208,6 +207,7 @@ def mainloop(gameobj, clock, screen):
     font = pygame.font.Font(f"{gameobj.media}/freesansbold.ttf", 24)
 
     while True:
+        updated = []
         if spawned.rect.x <= 5:
             spawned = spawn_obstacle(gameobj, obstacles)
 
@@ -224,10 +224,10 @@ def mainloop(gameobj, clock, screen):
             sys.exit(1)
 
         for i in range(0, gameobj.tiles):
-            screen.blit(background, (i * background_width + gameobj.scroll, 0))
+            updated.append(screen.blit(background, (i * background_width + gameobj.scroll, 0)))
 
         spawned.rect.x -= 3
-        screen.blit(spawned.sf, spawned.rect)
+        updated.append(screen.blit(spawned.sf, spawned.rect))
         gameobj.scroll -= gameobj.scrollstep
 
         if abs(gameobj.scroll) > background_width:
@@ -236,7 +236,7 @@ def mainloop(gameobj, clock, screen):
         if spawned.obstacle.hit is True and spawned.obstacle.powerup is None:
             spawned.rect.y -= spawned.velocity
             spawned.velocity -= gameobj.y_gravity
-            screen.blit(spawned.sf, spawned.rect)
+            updated.append(screen.blit(spawned.sf, spawned.rect))
 
         if gameobj.jumps:
             thisvehicle.y -= gameobj.y_velocity
@@ -251,19 +251,20 @@ def mainloop(gameobj, clock, screen):
                     thisvehicle.y,
                 )
             )
-            screen.blit(vhsf_jumping, vehicle_rect)
+            updated.append(screen.blit(vhsf_jumping, vehicle_rect))
         else:
             vehicle_rect = vhsf_jumping.get_rect(
                 center=(thisvehicle.x_start, gameobj.platform_height)
             )
-            screen.blit(vhsf_standing, vehicle_rect)
+            updated.append(screen.blit(vhsf_standing, vehicle_rect))
 
         draw_coins(screen, gameobj, vh_jumping)
 
         img = font.render(f"FPS: [{int(clock.get_fps())}]", True, (0, 0, 0))
-        screen.blit(img, (690, 10))
+        updated.append(screen.blit(img, (690, 10)))
 
-        pygame.display.update()
+        pygame.display.update(updated)
+        updated = []
         clock.tick(gameobj.fps)
 
     mixer.music.stop()
