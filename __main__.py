@@ -29,6 +29,7 @@ def load_obstacles(path):
             x=info["x"],
             image=pygame.image.load(f"{odir}/img.png"),
         )
+        this.sf = pygame.transform.scale(this.image, (this.height, this.width))
         try:
             this.powerup = info["powerup"]
         except KeyError:
@@ -63,6 +64,7 @@ def load_vehicles(path):
             name=info["name"],
             image=pygame.image.load(f"{odir}/img.png"),
         )
+        this.sf = pygame.transform.scale(this.image, (this.height, this.width))
         vehicles.append(this)
 
     return vehicles
@@ -121,24 +123,17 @@ def menu(screen, gameobj):
     mymenu.mainloop(screen)
 
 
-def getsf(item):
-    return pygame.transform.scale(item.image, (item.height, item.width))
-
-
 def draw_coins(screen, gameobj, vh_jumping):
-    coinsf = getsf(vh_jumping)
     s = vh_jumping.width
     for _ in range(0, gameobj.coins):
-        coin_rect = coinsf.get_rect(center=(s, 45))
-        screen.blit(coinsf, coin_rect)
+        coin_rect = vh_jumping.sf.get_rect(center=(s, 45))
+        screen.blit(vh_jumping.sf, coin_rect)
         s += vh_jumping.width + 20
 
 
 def spawn_obstacle(gameobj, obstacles):
     obstacle_ = obstacles[random.randrange(0, len(obstacles))]
-    obstaclesf = getsf(obstacle_)
-
-    obstacle_rect = obstaclesf.get_rect(center=(obstacle_.x, gameobj.platform_height))
+    obstacle_rect = obstacle_.sf.get_rect(center=(obstacle_.x, gameobj.platform_height))
 
     if obstacle_.powerup is not None:
         obstacle_rect.y = random.randrange(200, 300)
@@ -149,7 +144,7 @@ def spawn_obstacle(gameobj, obstacles):
 
     return spawnedobstacle(
         obstacle=obstacle_,
-        sf=obstaclesf,
+        sf=obstacle_.sf,
         rect=obstacle_rect,
         velocity=gameobj.y_velocity,
     )
@@ -193,9 +188,7 @@ def mainloop(gameobj, clock, screen):
     vh_jumping = copy.copy(thisvehicle)
     vh_jumping.height = 66
     vh_jumping.width = 44
-    vhsf_standing = getsf(vh_standing)
-    vhsf_jumping = getsf(vh_jumping)
-    vehicle_rect = vhsf_standing.get_rect(center=(thisvehicle.x_start, thisvehicle.y))
+    vehicle_rect = vh_standing.sf.get_rect(center=(thisvehicle.x_start, thisvehicle.y))
     mixer.music.load(thisvehicle.sound)
     mixer.music.play(loops=-1)
 
@@ -207,7 +200,13 @@ def mainloop(gameobj, clock, screen):
     font = pygame.font.Font(f"{gameobj.media}/freesansbold.ttf", 24)
 
     while True:
+        clock.tick(gameobj.fps)
         updated = []
+        for i in range(0, gameobj.tiles):
+            updated.append(
+                screen.blit(background, (i * background_width + gameobj.scroll, 0))
+            )
+
         if spawned.rect.x <= 5:
             spawned = spawn_obstacle(gameobj, obstacles)
 
@@ -222,9 +221,6 @@ def mainloop(gameobj, clock, screen):
             jump.play()
         if keys_pressed[pygame.K_ESCAPE]:
             sys.exit(1)
-
-        for i in range(0, gameobj.tiles):
-            updated.append(screen.blit(background, (i * background_width + gameobj.scroll, 0)))
 
         spawned.rect.x -= 3
         updated.append(screen.blit(spawned.sf, spawned.rect))
@@ -245,18 +241,18 @@ def mainloop(gameobj, clock, screen):
                 gameobj.jumps = False
                 gameobj.y_velocity = gameobj.jump_height
 
-            vehicle_rect = vhsf_jumping.get_rect(
+            vehicle_rect = vh_jumping.sf.get_rect(
                 center=(
                     thisvehicle.x_start,
                     thisvehicle.y,
                 )
             )
-            updated.append(screen.blit(vhsf_jumping, vehicle_rect))
+            updated.append(screen.blit(vh_jumping.sf, vehicle_rect))
         else:
-            vehicle_rect = vhsf_jumping.get_rect(
+            vehicle_rect = vh_jumping.sf.get_rect(
                 center=(thisvehicle.x_start, gameobj.platform_height)
             )
-            updated.append(screen.blit(vhsf_standing, vehicle_rect))
+            updated.append(screen.blit(vh_standing.sf, vehicle_rect))
 
         draw_coins(screen, gameobj, vh_jumping)
 
@@ -265,7 +261,6 @@ def mainloop(gameobj, clock, screen):
 
         pygame.display.update(updated)
         updated = []
-        clock.tick(gameobj.fps)
 
     mixer.music.stop()
     crash = mixer.Sound(f"{gameobj.media}/crash.ogg")

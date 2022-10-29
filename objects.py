@@ -19,6 +19,8 @@ class obstacle:
     powerup: str = None
     hit: bool = False
     image: object = None
+    sf: object = None
+
 
 @dataclass
 class spawnedobstacle:
@@ -26,6 +28,7 @@ class spawnedobstacle:
     sf: object
     rect: object
     velocity: int
+
 
 @dataclass
 class world:
@@ -56,7 +59,7 @@ class game:
     caption: str = "simons traktor spiel"
     tiles: int = 0
     jumps: bool = False
-    media: str =  asset_dir
+    media: str = asset_dir
     media_obstacles = f"{media}/obstacles/"
     media_vehicles = f"{media}/vehicles/"
     media_worlds = f"{media}/worlds/"
@@ -80,3 +83,4 @@ class vehicle:
     x: int = 200
     x_start: int = 200
     image: object = None
+    sf: object = None
