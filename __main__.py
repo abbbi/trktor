@@ -27,7 +27,7 @@ def load_obstacles(path):
             width=info["width"],
             height=info["height"],
             x=info["x"],
-            image=pygame.image.load(f"{odir}/img.png"),
+            image=pygame.image.load(f"{odir}/img.png").convert_alpha(),
         )
         try:
             this.powerup = info["powerup"]
@@ -224,7 +224,9 @@ def mainloop(gameobj, clock, screen):
             sys.exit(1)
 
         for i in range(0, gameobj.tiles):
-            updated.append(screen.blit(background, (i * background_width + gameobj.scroll, 0)))
+            updated.append(
+                screen.blit(background, (i * background_width + gameobj.scroll, 0))
+            )
 
         spawned.rect.x -= 3
         updated.append(screen.blit(spawned.sf, spawned.rect))
@@ -273,7 +275,7 @@ def mainloop(gameobj, clock, screen):
 
 
 def draw_background(screen, asset):
-    background = pygame.image.load(asset)
+    background = pygame.image.load(asset).convert()
     screen.blit(background, (0, 0))
     return background
 
