@@ -176,6 +176,13 @@ def handle_collide(gameobj, vehicle_rect, spawned):
     return False
 
 
+def rotate(image, angle):
+    loc = image.get_rect().center
+    rot = pygame.transform.rotate(image, angle)
+    rot.get_rect().center = loc
+    return rot
+
+
 def mainloop(gameobj, clock, screen):
     gameobj.coin_sound = mixer.Sound(f"{gameobj.media}/coin.ogg")
     gameobj.hit_sound = mixer.Sound(f"{gameobj.media}/hit.ogg")
@@ -206,7 +213,10 @@ def mainloop(gameobj, clock, screen):
     jump = mixer.Sound(f"{gameobj.media}/jump.ogg")
     font = pygame.font.Font(f"{gameobj.media}/freesansbold.ttf", 24)
 
+    angle = 0
     while True:
+        if angle >= 360:
+            angle = 0
         updated = []
         if spawned.rect.x <= 5:
             spawned = spawn_obstacle(gameobj, obstacles)
@@ -229,15 +239,19 @@ def mainloop(gameobj, clock, screen):
             )
 
         spawned.rect.x -= 3
-        updated.append(screen.blit(spawned.sf, spawned.rect))
         gameobj.scroll -= gameobj.scrollstep
 
         if abs(gameobj.scroll) > background_width:
             gameobj.scroll = 0
 
         if spawned.obstacle.hit is True and spawned.obstacle.powerup is None:
+            if angle >= 360:
+                angle = 0
+            angle += 1
             spawned.rect.y -= spawned.velocity
             spawned.velocity -= gameobj.y_gravity
+            updated.append(screen.blit(rotate(spawned.sf, angle), spawned.rect))
+        else:
             updated.append(screen.blit(spawned.sf, spawned.rect))
 
         if gameobj.jumps:
