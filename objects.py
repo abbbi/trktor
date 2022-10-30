@@ -5,6 +5,7 @@ Simons jump game
 import os
 import sys
 from dataclasses import dataclass
+from pygame import Rect, Surface
 
 bundle_dir = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
 asset_dir = os.path.abspath(os.path.join(bundle_dir, "assets"))
@@ -22,9 +23,9 @@ class obstacle:
 
 @dataclass
 class spawnedobstacle:
-    obstacle: object
-    sf: object
-    rect: object
+    obstacle: obstacle
+    sf: Surface
+    rect: Rect
     velocity: int
 
 @dataclass
