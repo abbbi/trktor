@@ -36,9 +36,9 @@ def load_highscores():
 
 
 def save_highscores(scores):
-    print(scores)
+    sort = sorted(scores, key=lambda d: d["score"], reverse=True)
     with open(scorefile, "w") as sf:
-        sf.write(json.dumps(scores))
+        sf.write(json.dumps(sort))
 
 
 def load_obstacles(path):
