@@ -7,14 +7,38 @@ import os
 import copy
 import math
 from datetime import datetime
+import dataclasses
 from glob import glob
 import json
 import random
 import pygame
 import pygame_menu
 from pygame import mixer
+from pathlib import Path
 
-from objects import obstacle, spawnedobstacle, world, surface, game, vehicle
+from objects import obstacle, spawnedobstacle, world, surface, game, vehicle, score
+
+home = Path.home()
+scorefile = f"{home}/trktor.scores"
+
+print(scorefile)
+
+
+def load_highscores():
+    scores = []
+    if os.path.exists(scorefile):
+        with open(scorefile, "r") as sf:
+            scores = json.loads(sf.read())
+    else:
+        scores = []
+
+    return scores
+
+
+def save_highscores(scores):
+    print(scores)
+    with open(scorefile, "w") as sf:
+        sf.write(json.dumps(scores))
 
 
 def load_obstacles(path):
@@ -217,6 +241,7 @@ def mainloop(gameobj, clock, screen):
     font = pygame.font.Font(f"{gameobj.media}/freesansbold.ttf", 24)
 
     angle = 0
+    scored = True
     while True:
         pygame.event.get()
         if handle_collide(gameobj, vehicle_rect, spawned) is True:
@@ -313,11 +338,15 @@ def main():
     start_time = datetime.now()
     while True:
         gameobj = game()
+        scores = load_highscores()
         menu(screen, gameobj)
-        print(gameobj.username.get_value())
         gameobj.platform_height = gameobj.world.y
         mainloop(gameobj, clock, screen)
-        print(gameobj.score)
+        score_entry = dataclasses.asdict(
+            score(name=gameobj.username.get_value(), score=gameobj.score)
+        )
+        scores.append(score_entry)
+        save_highscores(scores)
 
 
 if __name__ == "__main__":
