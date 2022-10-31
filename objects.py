@@ -68,6 +68,8 @@ class game:
     platform_height: int = 0
     vehicle: object = None
     world: object = None
+    username: str = None
+    score: int = 0
 
 
 @dataclass

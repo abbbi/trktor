@@ -101,6 +101,7 @@ def menu(screen, gameobj):
             gameobj.world = worlds[two]
             gameobj.platform_height = gameobj.world.y
 
+    gameobj.username = mymenu.add.text_input("Name: ", default="Simon", maxchar=10)
     mymenu.add.selector(
         "Modus: ", [("Einfach", 0), ("Schwer", 10)], onchange=set_difficulty
     )
@@ -144,6 +145,7 @@ def spawn_obstacle(gameobj, obstacles):
         obstacle_rect.y = random.randrange(200, 300)
     else:
         obstacle_rect.y = gameobj.platform_height - 30
+        gameobj.score += 1
     obstacle_rect.x = obstacle_.x
     obstacle_.hit = False
 
@@ -162,6 +164,7 @@ def handle_collide(gameobj, vehicle_rect, spawned):
         if spawned.obstacle.hit is False:
             gameobj.hit_sound.play()
             gameobj.coins -= 1
+            gameobj.score -= 1
             spawned.obstacle.hit = True
 
     if vehicle_rect.colliderect(spawned.rect) and spawned.obstacle.powerup == "coin":
@@ -215,16 +218,17 @@ def mainloop(gameobj, clock, screen):
 
     angle = 0
     while True:
-        if angle >= 360:
-            angle = 0
-        updated = []
-        if spawned.rect.x <= 5:
-            spawned = spawn_obstacle(gameobj, obstacles)
-
+        pygame.event.get()
         if handle_collide(gameobj, vehicle_rect, spawned) is True:
             break
 
-        pygame.event.get()
+        if angle >= 360:
+            angle = 0
+
+        updated = []
+        if spawned.rect.x <= 5:
+            spawned = spawn_obstacle(gameobj, obstacles)
+            scored = False
 
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_SPACE]:
@@ -245,6 +249,9 @@ def mainloop(gameobj, clock, screen):
             gameobj.scroll = 0
 
         if spawned.obstacle.hit is True and spawned.obstacle.powerup is None:
+            if scored is True:
+                gameobj.score -= 1
+                scored = False
             if angle >= 360:
                 angle = 0
             angle += 1
@@ -307,8 +314,10 @@ def main():
     while True:
         gameobj = game()
         menu(screen, gameobj)
+        print(gameobj.username.get_value())
         gameobj.platform_height = gameobj.world.y
         mainloop(gameobj, clock, screen)
+        print(gameobj.score)
 
 
 if __name__ == "__main__":
