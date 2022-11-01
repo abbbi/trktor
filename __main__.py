@@ -104,10 +104,14 @@ def highscores(screen, gameobj, scores):
         title="Highscores",
         width=gameobj.screen_w,
     )
+    cnt = 0
     for e in scores:
         mymenu.add.label(
             f"{e['name']}: {e['score']}", align=pygame_menu.locals.ALIGN_CENTER
         )
+        cnt += 1
+        if cnt >= 5:
+            break
     mymenu.add.vertical_margin(25)
     mymenu.add.button("Nochmal", mymenu.disable)
     mymenu.mainloop(screen)
