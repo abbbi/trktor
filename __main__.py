@@ -92,6 +92,25 @@ def load_vehicles(path):
     return vehicles
 
 
+def highscores(screen, gameobj, scores):
+    myimage = pygame_menu.baseimage.BaseImage(image_path=f"{gameobj.media}/menu.png")
+    mytheme = pygame_menu.themes.THEME_ORANGE.copy()
+    mytheme.title_background_color = (0, 0, 0)
+    mytheme.background_color = myimage
+
+    mymenu = pygame_menu.Menu(
+        height=gameobj.screen_h,
+        theme=mytheme,
+        title="Highscores",
+        width=gameobj.screen_w,
+    )
+    for e in scores:
+        mymenu.add.label(e["name"], align=pygame_menu.locals.ALIGN_CENTER)
+    mymenu.add.vertical_margin(25)
+    mymenu.add.button("Nochmal", mymenu.disable)
+    mymenu.mainloop(screen)
+
+
 def menu(screen, gameobj):
     mixer.music.load(f"{gameobj.media}/menu.mp3")
     mixer.music.play()
@@ -347,6 +366,7 @@ def main():
         )
         scores.append(score_entry)
         save_highscores(scores)
+        highscores(screen, gameobj, scores)
 
 
 if __name__ == "__main__":
