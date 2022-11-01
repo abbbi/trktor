@@ -367,11 +367,13 @@ def main():
         menu(screen, gameobj)
         gameobj.platform_height = gameobj.world.y
         mainloop(gameobj, clock, screen)
-        score_entry = dataclasses.asdict(
-            score(name=gameobj.username.get_value(), score=gameobj.score)
-        )
-        scores.append(score_entry)
-        save_highscores(scores)
+        if gameobj.score > 0:
+            score_entry = dataclasses.asdict(
+                score(name=gameobj.username.get_value(), score=gameobj.score)
+            )
+            scores.append(score_entry)
+            save_highscores(scores)
+        scores = load_highscores()
         highscores(screen, gameobj, scores)
 
 
