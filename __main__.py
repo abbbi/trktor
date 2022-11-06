@@ -305,7 +305,7 @@ def mainloop(gameobj, clock, screen):
             if angle >= 360:
                 angle = 0
             angle += 1
-            spawned.rect.y -= spawned.velocity
+            spawned.rect.y -= round(spawned.velocity)
             spawned.velocity -= gameobj.y_gravity
             updated.append(screen.blit(rotate(spawned.sf, angle), spawned.rect))
         else:
@@ -320,8 +320,8 @@ def mainloop(gameobj, clock, screen):
 
             vehicle_rect = vhsf_jumping.get_rect(
                 center=(
-                    thisvehicle.x_start,
-                    thisvehicle.y,
+                    round(thisvehicle.x_start),
+                    round(thisvehicle.y),
                 )
             )
             updated.append(screen.blit(vhsf_jumping, vehicle_rect))
